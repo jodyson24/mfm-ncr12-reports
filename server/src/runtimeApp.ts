@@ -9,6 +9,8 @@ import {
   HeadObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { readFile } from "node:fs/promises";
+import { extname, join, normalize } from "node:path";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { Db } from "mongodb";
 import { parseReportInput } from "../../shared/src/validation.js";
@@ -70,6 +72,48 @@ const s3 = new S3Client({
     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
   },
 });
+const contentTypes: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".ico": "image/x-icon",
+};
+const serveClient = async (req: IncomingMessage, res: ServerResponse) => {
+  const dist = normalize(join(process.cwd(), "client", "dist"));
+  const requested = req.url === "/" ? "index.html" : (req.url || "/").slice(1);
+  const filePath = normalize(join(dist, requested));
+  if (
+    filePath !== dist &&
+    !filePath.startsWith(`${dist}/`) &&
+    !filePath.startsWith(`${dist}\\`)
+  ) {
+    res.writeHead(400);
+    res.end("Bad request");
+    return;
+  }
+  try {
+    const file = await readFile(filePath);
+    res.writeHead(200, {
+      "content-type": contentTypes[extname(filePath).toLowerCase()] || "application/octet-stream",
+    });
+    res.end(file);
+  } catch {
+    try {
+      const index = await readFile(join(dist, "index.html"));
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(index);
+    } catch {
+      res.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      res.end("Not found");
+    }
+  }
+};
 export function createRuntimeApp(
   options: { ready?: () => Promise<boolean>; db?: Db } = {},
 ) {
@@ -248,6 +292,7 @@ export function createRuntimeApp(
         log.info("report.published", { requestId, reportId: report.id, fileCount: report.fileCount });
         return json(res, 201, report);
       }
+      if (!url.pathname.startsWith("/api/")) return serveClient(req, res);
       return json(res, 404, { error: "not found" });
     } catch (error) {
       const name = error instanceof Error ? error.name : "Error";

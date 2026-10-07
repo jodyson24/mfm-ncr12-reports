@@ -11,5 +11,6 @@ COPY client/package.json ./client/package.json
 RUN npm ci --include=dev
 COPY . .
 RUN npm run typecheck
+RUN npm run build
 EXPOSE 3000
 CMD ["node","--import","tsx","server/src/index.ts"]
