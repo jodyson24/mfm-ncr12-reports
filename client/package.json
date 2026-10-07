@@ -1,0 +1,16 @@
+{
+    "name": "@mfm-ncr12/client",
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "vite": "^5.4.0"
+    }
+}

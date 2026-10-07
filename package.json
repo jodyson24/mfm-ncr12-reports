@@ -1,0 +1,37 @@
+{
+    "name": "mfm-ncr12-reports",
+    "private": true,
+    "workspaces": [
+        "shared",
+        "server",
+        "worker",
+        "client"
+    ],
+    "scripts": {
+        "build": "npm run build -w client",
+        "start": "node --import tsx server/src/index.ts",
+        "dev": "node scripts/dev.mjs",
+        "start:backend": "nodemon --watch server/src --watch shared/src --ext ts --exec \"node --import tsx server/src/index.ts\"",
+        "start:frontend": "npm run dev -w client",
+        "start-all": "node scripts/dev.mjs",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "@types/react": "^18.3.31",
+        "@types/react-dom": "^18.3.7",
+        "nodemon": "^3.1.14",
+        "tsx": "^4.19.0",
+        "typescript": "^5.6.0",
+        "vite": "^5.4.0",
+        "vitest": "^2.1.0"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.1147.0",
+        "@aws-sdk/lib-storage": "^3.1147.0",
+        "@aws-sdk/s3-request-presigner": "^3.1147.0",
+        "dotenv": "^16.6.1",
+        "mongodb": "^6.21.0"
+    }
+}

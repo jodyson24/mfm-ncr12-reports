@@ -1,0 +1,1 @@
+import React from'react';import{MediaPreview}from'./MediaPreview.js';export function AttachmentGallery({files}:{files:{id:string;name:string;category:string;previewUrl?:string;downloadUrl:string}[]}){if(!files.length)return <p>No attachments.</p>;return <section aria-label="Attachments" className="media-grid">{files.map(file=><MediaPreview key={file.id} file={file}/>)}</section>}

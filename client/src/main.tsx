@@ -1,0 +1,2 @@
+import'./styles.css';import'./toast.css';import'./upload-ui.css';import'./dashboard.css';import'./media-preview.css';import React from'react';import{createRoot}from'react-dom/client';import{DashboardApp}from'./DashboardApp.js';import{ToastProvider}from'./Toast.js';import{ReportsProvider}from'./ReportsContext.js';
+createRoot(document.getElementById('root')!).render(<ToastProvider><ReportsProvider><DashboardApp/></ReportsProvider></ToastProvider>);
